@@ -1,0 +1,244 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <conio.h>
+
+int vno;
+float count;
+char dname[15], x, l[50];
+
+int login();
+
+void input()
+{
+    system("CLS");
+    printf("\n\n\t\tEnter the name of driver : ");
+    scanf("%s", dname);
+    printf("\n\n\t\tEnter the car no : ");
+    scanf("%d", &vno);
+    printf("\n\n\t\tEnter the no of hours of stay : ");
+    scanf("%f", &count);
+    printf("\n\n\t\tEnter the time slot : ");
+    scanf("%s", l);
+    if (count < 8)
+    {
+        printf("\n\n\t\tParking Available! You can park your car. ");
+    }
+    else
+        printf("\n\n\t\t Parking not possible!!");
+    printf("\n\n\t\tCar got parked!!");
+}
+
+void cal()
+{
+    printf("\n\t\n\tAre you a V.I.P: y/n ");
+    scanf(" %c", &x);
+    if (x == 'y')
+    {
+        system("CLS");
+        printf("\n\t\n\tThe total expense during parking  ");
+        printf("%.2f rupees", count * 20);
+    }
+    else
+    {
+        system("CLS");
+        printf("\n\t\n\tThe total expenses during parking  ");
+        printf("%.2f rupees", count * 25);
+    }
+}
+
+void output()
+{
+    printf("\n\n\t\tThe Driver Name : %s\n", dname);
+    printf("\n\n\t\tThe Car No : %d\n", vno);
+    printf("\n\n\t\tThe Hours Of Stay : %.2f", count);
+    printf("\n\n\t\tThe Time Slot Of Parking : %s", l);
+}
+
+void delete_record()
+{
+    int n;
+    system("CLS");
+    printf("\n\n\t\tEnter the car no you want to get depart : ");
+    scanf("%d", &n);
+    FILE *inFile;
+    inFile = fopen("parking3.dat", "rb");
+    FILE *outFile;
+    outFile = fopen("temp.dat", "wb");
+    int current_vno;
+    float current_count;
+    char current_dname[15], current_x, current_l[50];
+    while (fread(&current_vno, sizeof(current_vno), 1, inFile))
+    {
+        fread(&current_count, sizeof(current_count), 1, inFile);
+        fread(&current_dname, sizeof(current_dname), 1, inFile);
+        fread(&current_x, sizeof(current_x), 1, inFile);
+        fread(&current_l, sizeof(current_l), 1, inFile);
+
+        if (current_vno != n)
+        {
+            fwrite(&current_vno, sizeof(current_vno), 1, outFile);
+            fwrite(&current_count, sizeof(current_count), 1, outFile);
+            fwrite(&current_dname, sizeof(current_dname), 1, outFile);
+            fwrite(&current_x, sizeof(current_x), 1, outFile);
+            fwrite(&current_l, sizeof(current_l), 1, outFile);
+        }
+    }
+    printf("\n\n\t\t Parking Record Deleted");
+    fclose(inFile);
+    fclose(outFile);
+    remove("parking3.dat");
+    rename("temp.dat", "parking3.dat");
+}
+
+int main()
+{
+    login();
+    int choice, vno1, d;
+    while (1)
+    {
+        system("CLS");
+        printf("\n\n\t\t ====== CAR PARKING RESERVATION SYSTEM ======");
+        printf("\n\n                                          ");
+        printf(" \n\t\t\t======================");
+        printf("\n\n\t\t\t  1. Arrival of a Car");
+        printf("\n\n\t\t\t  2. Total no of cars Arrived");
+        printf("\n\n\t\t\t  3. Total parking charges of all cars with details");
+        printf("\n\n\t\t\t  4. Departure of the car");
+        printf("\n\n\t\t\t  5. Exit Program");
+        printf(" \n\t\t\t======================");
+        printf("\n\n");
+        printf("\t\t\t Select Your Choice ::");
+        scanf("%d", &choice);
+        switch (choice)
+        {
+        case 1:
+        {
+            char f;
+            printf("\n\n\t\t==Do You Want to continue==y/n ");
+            scanf(" %c", &f);
+            if (f == 'y')
+            {
+                FILE *f1;
+                f1 = fopen("parking3.dat", "ab");
+                input();
+                fwrite(&vno, sizeof(vno), 1, f1);
+                fwrite(&count, sizeof(count), 1, f1);
+                fwrite(&dname, sizeof(dname), 1, f1);
+                fwrite(&x, sizeof(x), 1, f1);
+                fwrite(&l, sizeof(l), 1, f1);
+                fclose(f1);
+            }
+            break;
+        }
+        case 2:
+        {
+            system("CLS");
+            printf("\n\n\t\t=== View the Records in the Parking Database ===");
+            printf("\n");
+            FILE *infile;
+            infile = fopen("parking3.dat", "rb");
+            int current_vno;
+            float current_count;
+            char current_dname[15], current_x, current_l[50];
+            int d = 1;
+            while (fread(&current_vno, sizeof(current_vno), 1, infile))
+            {
+                fread(&current_count, sizeof(current_count), 1, infile);
+                fread(&current_dname, sizeof(current_dname), 1, infile);
+                fread(&current_x, sizeof(current_x), 1, infile);
+                fread(&current_l, sizeof(current_l), 1, infile);
+
+                system("CLS");
+                printf("\n");
+                printf("\n\n\tThe Car position in parking lot : %d", d);
+                d++;
+                printf("\n\n\t\tThe Driver Name : %s\n", current_dname);
+                printf("\n\n\t\tThe Car No : %d\n", current_vno);
+                printf("\n\n\t\tThe Hours Of Stay : %.2f", current_count);
+                printf("\n\n\t\tThe Time Slot Of Parking : %s", current_l);
+                printf("\n");
+                printf("\n\n\n");
+                system("PAUSE");
+                printf("\n");
+            }
+            fclose(infile);
+            break;
+        }
+        case 4:
+        {
+            delete_record();
+            break;
+        }
+        case 3:
+        {
+            FILE *infile;
+            infile = fopen("parking3.dat", "rb");
+            int current_vno;
+            float current_count;
+            char current_dname[15], current_x, current_l[50];
+            while (fread(&current_vno, sizeof(current_vno), 1, infile))
+            {
+                fread(&current_count, sizeof(current_count), 1, infile);
+                fread(&current_dname, sizeof(current_dname), 1, infile);
+                fread(&current_x, sizeof(current_x), 1, infile);
+                fread(&current_l, sizeof(current_l), 1, infile);
+
+                printf("\n");
+                cal();
+                printf("\n\n\t\tThe Driver Name : %s\n", current_dname);
+                printf("\n\n\t\tThe Car No : %d\n", current_vno);
+                printf("\n\n\t\tThe Hours Of Stay : %.2f", current_count);
+                printf("\n\n\t\tThe Time Slot Of Parking : %s", current_l);
+                printf("\n");
+                printf("\n");
+            }
+            fclose(infile);
+            break;
+        }
+        case 5:
+        {
+            system("CLS");
+            printf("\n\n\n\t\t\tThank you for using our software \n");
+            exit(0);
+            break;
+        }
+        default:
+        {
+            printf("\n\n\t\t Invalid input");
+            printf("\n\n\t\tPress Enter to continue");
+        }
+        }
+        getch();
+    }
+}
+
+int login()
+{
+    char pass[100] = "";
+    char ch;
+    printf("\n\n\n\n\n\n\n\t\t\t\t\tCar Parking Reservation System Login");
+    printf("\n\n\n\n\n\n\n\t\t\t\t\t\tEnter Password: ");
+    ch = getch();
+    int i = 0;
+    while (ch != 13)
+    {
+        pass[i] = ch;
+        printf("");
+        ch = getch();
+        i++;
+    }
+    if (strcmp(pass, "pass") == 0)
+    {
+        printf("\n\n\n\n\t\t\t\t\t  Access Granted! Welcome To Our System \n\n");
+        system("PAUSE");
+    }
+    else
+    {
+        printf("\n\n\n\n\t\t\t\t\tAccess Aborted...Please Try Again!!\n");
+        system("PAUSE");
+        system("CLS");
+        login();
+    }
+}
+
